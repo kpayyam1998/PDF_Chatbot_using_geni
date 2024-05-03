@@ -1,14 +1,16 @@
 import os
 import streamlit as st
 import base64
-st.title("File Extractor....")
+st.title("Chat with PDF using GENIAI")
 st.sidebar.title("File Details")
 # Handling the pdf files
 def display_pdf(file):
     with open(file,"rb") as file_obj:
         base64_pdf=base64.b64encode(file_obj.read()).decode("utf-8")
-    pdf_display = f'<iframe  src="data:application/pdf;base64,{base64_pdf}" width="100%" height="300"  type="application/pdf"></iframe>'
+    pdf_display = f'<iframe  src="data:application/pdf;base64,{base64_pdf}" width="100%" height="500"  type="application/pdf"></iframe>'
     st.markdown(pdf_display,unsafe_allow_html=True)
+
+
 file_upload=st.sidebar.file_uploader("Upload file...",type=["pdf","docx"])
 if file_upload:
     st.sidebar.success("File Uploaded successfully",icon="✅")
@@ -21,6 +23,8 @@ if file_upload:
     }
     st.sidebar.json(file_details) 
     #save locally
+    file_dir="docs"
+    os.makedirs(file_dir,exist_ok=True)
     file_path="docs/"+file_upload.name
     with open(file_path,"wb") as f:
         f.write(file_upload.getbuffer())
@@ -31,6 +35,11 @@ if file_upload:
         display_pdf(file_path)
     with col2:
         st.markdown("<h2 style=text-aligh:center> QA-Bot</h2>",unsafe_allow_html=True)
-        st.write("hello")
-else:
-    st.sidebar.error("Please upload a pdf/doc file",icon="🚨")
+
+        if "generated" not in st.session_state:
+            st.session_state["generated"]=["I am ready to help you"]
+        if "past" not in st.session_state:
+            st.session_state["past"]=["hey there"]
+            
+# else:
+#     st.sidebar.error("Please upload a pdf/doc file",icon="🚨")
